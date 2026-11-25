@@ -296,6 +296,10 @@ class Control4AlarmControlPanel(Control4Entity, AlarmControlPanelEntity):  # typ
     def _is_triggered(self) -> bool:
         """Return True when the panel reports an active alarm."""
         attrs = self.extra_state_attributes
+        # Texecom driver reports a trigger as PARTITION_STATE "ALARM" while
+        # ALARM_STATE stays 0 and ALARM_TYPE stays empty, so check it here.
+        if str(attrs.get(CONTROL4_PARTITION_STATE_VAR) or "").strip() == "ALARM":
+            return True
         alarm_flag = attrs.get(CONTROL4_ALARM_STATE_VAR)
         if alarm_flag is not None and str(alarm_flag) not in ("0", "", "False", "false"):
             try:
